@@ -1,0 +1,16 @@
+{
+    "name": "kuzaxak/nod_upd_php",
+    "description": "Update Nod32 base",
+    "keywords": ["upd", "nod"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kuzaxa",
+            "email": "kuzaxak.tech@gmail.com"
+        }
+    ],
+    "require": {
+        "swiftmailer/swiftmailer": "@stable"
+    },
+    "minimum-stability": "stable"
+}

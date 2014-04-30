@@ -1,5 +1,6 @@
-#!/usr/bin/php
 <?php
+
+require __DIR__.'/vendor/autoload.php';
 
 /*
  * Quick & Dirty Script to manage NOD 32 Updates
@@ -11,6 +12,7 @@
  *  Новые версии и описание программы можно взять
  * http://www.volmed.org.ru/wiki/index.php/Скрипт_по_обновлению_антивирусных_баз_NOD32_под_Linux_(PHP)
  */
+
 
  $start = microtime(true);
 //Отображать все ошибки, кроме notice и strict
@@ -115,7 +117,7 @@ foreach ($servers as $server)
 		}
 	}
 	//print_r($upd_ser2);
-	if ($quiet==false) echo "Update base for NOD32 {$server['type']}\n";
+	if ($quiet==false) echo "Update base for NOD32 {$server['type']}\r\n";
 	// Для каждого из хостов пробуем обновиться, пока не получится
 	foreach ($upd_ser2 as $upd_ser3)
 	{
@@ -320,7 +322,7 @@ foreach ($servers as $server)
 					}
 					else
 					{
-						print_r($vars);
+//						print_r($vars);
 						echo "size_file=$size5\n";
 						echo "size_file_upd.ver=".$vars['size']."\n";
 						echo "Error size of loading file {$vars['file']}\n";
@@ -378,7 +380,7 @@ foreach ($servers as $server)
 		// Если задан ящик отправляем почту
 		if (isset($user_mail)==true)
 		{
-			$mail_text = $mail_text."\n!!! ERROR of update base for NOD32 ".$server['type']." last " .$version_old;
+			$mail_text = $mail_text."\n!!! ERROR of update base for NOD32 ".$server['type']." last " .$version_old."\r\n"."User: ".${'user'.$server['type']}." Pass: ".${'psw'.$server['type']};
 			$mail_cont = $mail_cont." Error ESET ".$server['type'].",";
 			//mail($user_mail, "ERROR ESET ".$server['type']." ".$version_old, $text);
 		}
@@ -396,7 +398,7 @@ foreach ($servers as $server)
 		{
 			if (isset($user_mail))
 			{
-				$mail_text = $mail_text."\nSUCCESS update base for NOD32 ".$server['type']." from  version " .$version_old." to version ".$version_new;
+				$mail_text = $mail_text."\nSUCCESS update base for NOD32 ".$server['type']." from  version " .$version_old." to version ".$version_new."\r\n"."User: ".${'user'.$server['type']}." Pass: ".${'psw'.$server['type']};
 				$mail_cont = $mail_cont." Succees ESET ".$server['type'].",";
 				//mail($user_mail, "SUCCESS ESET ".$server['type']."  ".$version_new, $text);
 			}
@@ -405,7 +407,20 @@ foreach ($servers as $server)
 
 	if ($quiet==false)	echo "\n\n";
 }
-if ($mail_text) mail($user_mail, $mail_cont, $mail_text);
+if ($mail_text) {
+    $message = Swift_Message::newInstance()
+        ->setSubject($mail_cont)
+        ->setFrom(array($smtpUser => 'Update Server'))
+        ->setTo(array($user_mail))
+        ->setBody($mail_text);
+
+    $transport = Swift_SmtpTransport::newInstance($smtpHost, $smtpPort)
+        ->setUsername($smtpUser)
+        ->setPassword($smtpPassword);
+
+    $mailer = Swift_Mailer::newInstance($transport);
+    $result = $mailer->send($message);
+}
 
 umask($umask_files);
 if ($quiet==false)	echo "Execution time ",round(microtime(true)-$start,4)," sec.\n";
