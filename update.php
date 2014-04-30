@@ -12,6 +12,8 @@
  * http://www.volmed.org.ru/wiki/index.php/Скрипт_по_обновлению_антивирусных_баз_NOD32_под_Linux_(PHP)
  */
 
+require __DIR__.'/vendor/autoload.php';
+
 $start = microtime(true);
 //Отображать все ошибки, кроме notice и strict
 error_reporting(E_ALL ^ E_NOTICE ^ E_STRICT);
